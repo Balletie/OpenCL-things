@@ -10,11 +10,15 @@ int main() {
 	err = clGetPlatformIDs(0, NULL, &num_plats);
 	if (err != CL_SUCCESS) printf("ERROR at line %u", __LINE__);
 	if (num_plats > 1) printf("There are %u platforms\n", num_plats);
-	else if (num_plats == 1) printf("There's exactly one platform\n");
+	else if (num_plats == 1) printf("There's exactly one platform, namely:\n");
 	else printf("There are no available platforms"), exit(0);
 
 	err = clGetPlatformIDs(1, &plat, NULL);
 	if (err != CL_SUCCESS) printf("ERROR at line %u", __LINE__);
+	char plat_info[1024];
+	err = clGetPlatformInfo(plat, CL_PLATFORM_VERSION, 1024, plat_info, NULL);
+	if (err != CL_SUCCESS) printf("ERROR at line %u", __LINE__);
+	printf(" * %s\n", plat_info);
 
 	err = clGetDeviceIDs(plat, CL_DEVICE_TYPE_ALL, 0, NULL, &num_devices);
 	if (err != CL_SUCCESS) printf("ERROR at line %u", __LINE__);
