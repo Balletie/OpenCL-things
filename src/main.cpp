@@ -31,7 +31,21 @@ int main() {
 	
 	char info[num_devices][1024];
 	for (int i = 0; i < num_devices; i++) {
-		clGetDeviceInfo(devices[i], CL_DEVICE_NAME, 1024, &info[i], NULL);
-		printf(" * %s\n", info[i]);
+		char name[256];
+		clGetDeviceInfo(devices[i], CL_DEVICE_NAME, 256, name, NULL);
+		printf(" * %s\n    Extensions:\n     ", name);
+		clGetDeviceInfo(devices[i], CL_DEVICE_EXTENSIONS, 1024, &info[i], NULL);
+		for (int j = 0; j < 1024; j++) {
+			if (info[i][j] == 0x00) break;
+			if (info[i][j] == 0x20) {
+				putchar('\n');
+				if (info[i][j+1] == 0x00) continue;
+				for (int k = 0; k < 5; k++) putchar(' ');
+				continue;
+			}
+			putchar(info[i][j]);
+		}
+		if (i != num_devices - 1) putchar('\n');
+		//printf(" * %s\n", info[i]);
 	}
 }
