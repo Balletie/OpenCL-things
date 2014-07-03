@@ -4,7 +4,14 @@
 int main() {
 	cl_int err = 0;
 	cl_uint num_devices;
+	cl_uint num_plats;
 	cl_platform_id plat;
+
+	err = clGetPlatformIDs(0, NULL, &num_plats);
+	if (err != CL_SUCCESS) printf("ERROR at line %u", __LINE__);
+	if (num_plats > 1) printf("There are %u platforms\n", num_plats);
+	else if (num_plats == 1) printf("There's exactly one platform\n");
+	else printf("There are no available platforms"), exit(0);
 
 	err = clGetPlatformIDs(1, &plat, NULL);
 	if (err != CL_SUCCESS) printf("ERROR at line %u", __LINE__);
