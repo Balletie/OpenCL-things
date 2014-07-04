@@ -39,12 +39,6 @@ int main() {
 			}
 		}
 	} catch (cl::Error err) {
-		std::cerr
-		<< "ERROR: "
-		<< err.what()
-		<< "("
-		<< err.err()
-		<< ")"
-		<< std::endl;
+		std::cerr << "ERROR: " << err.what() << "(" << err.err() << ")" << std::endl;
 	}
 }
