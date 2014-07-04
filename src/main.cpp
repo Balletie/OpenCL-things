@@ -1,5 +1,5 @@
 #define __CL_ENABLE_EXCEPTIONS
-#include "OpenCL/cl.hpp"
+#include <OpenCL/cl.hpp>
 #include <stdio.h>
 #include <iostream>
 
