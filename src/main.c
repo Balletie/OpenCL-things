@@ -6,6 +6,27 @@
 
 #include <stdio.h>
 
+void printCLDeviceInfo(cl_device_id device, bool print_extensions) {
+	char name[256];
+	clGetDeviceInfo(device, CL_DEVICE_NAME, 256, name, NULL);
+	printf(" * %s\n", name);
+	if (!print_extensions) return;
+
+	char info[1024];
+	printf("    Extensions:\n     ");
+	clGetDeviceInfo(device, CL_DEVICE_EXTENSIONS, 1024, info, NULL);
+	for (int j = 0; j < 1024; j++) {
+		if (info[j] == 0x00) break;
+		if (info[j] == 0x20) {
+			putchar('\n');
+			if (info[j+1] == 0x00) continue;
+			for (int k = 0; k < 5; k++) putchar(' ');
+			continue;
+		}
+		putchar(info[j]);
+	}
+}
+
 int main() {
 	cl_int err = 0;
 	cl_uint num_devices;
@@ -38,22 +59,8 @@ int main() {
 		err = clGetDeviceIDs(plat[i], CL_DEVICE_TYPE_ALL, num_devices, devices, NULL);
 		if (err != CL_SUCCESS)		printf("ERROR at line %u", __LINE__);
 		
-		char info[num_devices][1024];
 		for (int i = 0; i < num_devices; i++) {
-			char name[256];
-			clGetDeviceInfo(devices[i], CL_DEVICE_NAME, 256, name, NULL);
-			printf(" * %s\n    Extensions:\n     ", name);
-			clGetDeviceInfo(devices[i], CL_DEVICE_EXTENSIONS, 1024, &info[i], NULL);
-			for (int j = 0; j < 1024; j++) {
-				if (info[i][j] == 0x00) break;
-				if (info[i][j] == 0x20) {
-					putchar('\n');
-					if (info[i][j+1] == 0x00) continue;
-					for (int k = 0; k < 5; k++) putchar(' ');
-					continue;
-				}
-				putchar(info[i][j]);
-			}
+			printCLDeviceInfo(devices[i],false);
 			if (i != num_devices - 1) putchar('\n');
 			//printf(" * %s\n", info[i]);
 		}
