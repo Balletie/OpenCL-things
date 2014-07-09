@@ -8,8 +8,8 @@ char* readFile(const char* filename) {
 	int length = file.tellg(); 
 	file.seekg(0, file.beg);
 
-	char* contents = new char[length];
+	char* contents = new char[length+1];
 	file.read(contents, length);
-
+	contents[length] = '\0';
 	return contents;
 }
