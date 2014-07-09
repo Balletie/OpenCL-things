@@ -102,7 +102,14 @@ int main() {
 	cl_program program = clCreateProgramWithSource(context, 1, (const char **) &program_source, NULL, &err);
 	if (err != CL_SUCCESS)		printf("ERROR at line %u\n", __LINE__);
 	err = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
-	if (err != CL_SUCCESS)		printf("ERROR at line %u\n", __LINE__);
+	if (err != CL_SUCCESS) {
+		size_t len;
+		char buffer[2048];
+
+		printf("Error: Failed to build program executable!\n");
+		clGetProgramBuildInfo(program, final_device, CL_PROGRAM_BUILD_LOG, sizeof(buffer), buffer, &len);
+		printf("%s\n", buffer);
+	}
 	cl_kernel kernel = clCreateKernel(program, "square", &err);
 	if (err != CL_SUCCESS)		printf("ERROR at line %u\n", __LINE__);
 
