@@ -90,22 +90,17 @@ int main() {
 	printf("%s\n", program_source);
 
 	// Set OpenCL context
-	printf("Check1\n");
 	cl_context context = clCreateContext(0, 1, &final_device, NULL, NULL, &err);
 	if (err != CL_SUCCESS)		printf("ERROR at line %u: Failed to make OpenCL context\n", __LINE__);
 
 	// Create command queue
-	printf("Check2\n");
 	cl_command_queue commands = clCreateCommandQueue(context, final_device, 0, &err);
 	if (err != CL_SUCCESS)		printf("ERROR at line %u\n", __LINE__);
 
 	// Create the program from source and build it.
-	printf("Check3\n");
 	cl_program program = clCreateProgramWithSource(context, 1, (const char **) &program_source, NULL, &err);
 	if (err != CL_SUCCESS)		printf("ERROR at line %u\n", __LINE__);
-	printf("Check4\n");
 	err = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
-	printf("Check5\n");
 	if (err != CL_SUCCESS)		printf("ERROR at line %u\n", __LINE__);
 	cl_kernel kernel = clCreateKernel(program, "square", &err);
 	if (err != CL_SUCCESS)		printf("ERROR at line %u\n", __LINE__);
