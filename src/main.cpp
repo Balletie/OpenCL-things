@@ -7,7 +7,7 @@
 #include <ios>
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
+#include <ctime>
 
 void printCLDeviceInfo(cl_device_id device, bool print_extensions) {
 	char name[256];
@@ -78,7 +78,7 @@ int main() {
 	}
 	printf("\n");
 
-	unsigned int count = 1024;
+	unsigned int count = 2048;
 	size_t local;
 	size_t global = count;
 	float input_data[count];
@@ -134,6 +134,7 @@ int main() {
 	err = clGetKernelWorkGroupInfo(kernel, final_device, CL_KERNEL_WORK_GROUP_SIZE, sizeof(local), &local, NULL);
 	if (err != CL_SUCCESS)		printf("ERROR at line %u\n", __LINE__);
 
+	std::clock_t c_start = std::clock();
 	// Execute the kernel
 	err = clEnqueueNDRangeKernel(commands, kernel, 1, NULL, &global, &local, 0, NULL, NULL);
 	if (err != CL_SUCCESS)		printf("ERROR at line %u\n", __LINE__);
@@ -143,11 +144,25 @@ int main() {
 
 	err = clEnqueueReadBuffer(commands, write_buffer, CL_TRUE, 0, sizeof(float)*count, output_data, 0, NULL, NULL);
 	if (err != CL_SUCCESS)		printf("ERROR at line %u\n", __LINE__);
+	std::clock_t c_end = std::clock();
+	printf("Test duration (OpenCL): %f ms\n", 1000.0 * (c_end - c_start) / CLOCKS_PER_SEC);
 
-	// Validate everything
-	int correct = 0;
+	float test_result[count];
+	c_start = std::clock();
 	for (int i = 0; i < count; i++) {
-		if (output_data[i] == input_data[i]*input_data[i]) correct++;
+		float num = input_data[i];
+		test_result[i] = num*num;
 	}
-	printf("%d/%d correct results\n", correct, count);
+	c_end = std::clock();
+	printf("Test duration (regular): %f ms\n", 1000.0 * (c_end - c_start) / CLOCKS_PER_SEC);
+	printf("Validating..:\n");
+	// Validate everything
+	int correct_opencl = 0;
+	int correct_regular = 0;
+	for (int i = 0; i < count; i++) {
+		if (output_data[i] == input_data[i]*input_data[i]) correct_opencl++;
+		if (test_result[i] == input_data[i]*input_data[i]) correct_regular++;
+	}
+	printf("%d/%d correct results (OpenCL)\n", correct_opencl, count);
+	printf("%d/%d correct results (regular)\n", correct_regular, count);
 }
