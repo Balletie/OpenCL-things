@@ -13,6 +13,11 @@ void printCLDeviceInfo(cl_device_id device, bool print_extensions) {
 	char name[256];
 	clGetDeviceInfo(device, CL_DEVICE_NAME, 256, name, NULL);
 	printf(" * %s\n", name);
+	size_t work_item_sizes[10];
+	clGetDeviceInfo(device, CL_DEVICE_MAX_WORK_ITEM_SIZES, sizeof(size_t)*10, &work_item_sizes, NULL);
+	for (int i = 0; i < 3; i++) {
+		printf("  Max work item size (dimension %d): %u\n",i, (unsigned int) work_item_sizes[i]);
+	}
 	if (!print_extensions) return;
 
 	char info[1024];
@@ -78,7 +83,7 @@ int main() {
 	}
 	printf("\n");
 
-	unsigned int count = 2048;
+	unsigned int count = 1024;
 	size_t local;
 	size_t global = count;
 	float input_data[count];
