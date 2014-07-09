@@ -59,9 +59,9 @@ int main() {
 		err = clGetDeviceIDs(plat[i], CL_DEVICE_TYPE_ALL, num_devices, devices, NULL);
 		if (err != CL_SUCCESS)		printf("ERROR at line %u", __LINE__);
 		
-		for (int i = 0; i < num_devices; i++) {
-			printCLDeviceInfo(devices[i],false);
-			if (i != num_devices - 1) putchar('\n');
+		for (int j = 0; j < num_devices; j++) {
+			printCLDeviceInfo(devices[j],true);
+			if (j != num_devices - 1) putchar('\n');
 			//printf(" * %s\n", info[i]);
 		}
 	}
