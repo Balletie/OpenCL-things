@@ -85,7 +85,7 @@ int main() {
 	}
 	printf("\n");
 
-	unsigned int count = 2048;
+	unsigned int count = 8192;
 	size_t local;
 	size_t global = count;
 	float input_data[count];
@@ -143,7 +143,7 @@ int main() {
 
 	std::clock_t c_start = std::clock();
 	// Execute the kernel
-	err = clEnqueueNDRangeKernel(commands, kernel, 1, NULL, &global, &local, 0, NULL, NULL);
+	err = clEnqueueNDRangeKernel(commands, kernel, 1, NULL, &global, NULL, 0, NULL, NULL);
 	if (err != CL_SUCCESS)		printf("ERROR at line %u\n", __LINE__);
 
 	// Give it time to finish
