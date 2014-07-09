@@ -62,7 +62,6 @@ int main() {
 		for (int j = 0; j < num_devices; j++) {
 			printCLDeviceInfo(devices[j],true);
 			if (j != num_devices - 1) putchar('\n');
-			//printf(" * %s\n", info[i]);
 		}
 	}
 }
