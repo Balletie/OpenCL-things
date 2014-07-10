@@ -1,3 +1,5 @@
+#define N 1024
+
 #ifdef __APPLE__
   #include <OpenCL/opencl.h>
 #else
@@ -86,7 +88,7 @@ int main() {
 	printf("\n");
 
 	size_t global = 8092;
-	unsigned int count = global * 1024;
+	unsigned int count = global * N;
 
 	// Fill the array
 	float* input_data = (float*)malloc(count * sizeof(float));
