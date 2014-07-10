@@ -61,7 +61,7 @@ int main() {
 		printf("Platform %d:\n", i);
 		printf(" * %s\n", plat_info);
 
-		err = clGetDeviceIDs(plat[i], CL_DEVICE_TYPE_ALL, 0, NULL, &num_devices);
+		err = clGetDeviceIDs(plat[i], CL_DEVICE_TYPE_GPU, 0, NULL, &num_devices);
 		if (err != CL_SUCCESS)		printf("ERROR at line %u\n", __LINE__);
 		printf("There are %u devices found, namely:\n", num_devices);
 
@@ -83,15 +83,15 @@ int main() {
 	}
 	printf("\n");
 
-	unsigned int count = 1024;
-	size_t local;
-	size_t global = count;
-	float input_data[count];
+	size_t global = 1024;
+	unsigned int count = global * 1024;
+
 	// Fill the array
+	float* input_data = (float*)malloc(count * sizeof(float));
 	srand(time(NULL));
-	for (int i = 0; i < count; i++) input_data[i] = rand() / (float)RAND_MAX;	
-	float output_data[count];
-	float results[count];
+	for (int i = 0; i < count; i++) input_data[i] = rand() / (float)RAND_MAX;
+
+	// Load the kernel
 	const char* program_source = readFile("kernel/square.cl");
 	printf("Loaded kernel program source:\n%s\n", program_source);
 
@@ -135,24 +135,21 @@ int main() {
 	err |= clSetKernelArg(kernel, 2, sizeof(unsigned int), &count);	
 	if (err != CL_SUCCESS)		printf("ERROR at line %u\n", __LINE__);
 
-	// Get the maximum work group size
-	err = clGetKernelWorkGroupInfo(kernel, final_device, CL_KERNEL_WORK_GROUP_SIZE, sizeof(local), &local, NULL);
-	if (err != CL_SUCCESS)		printf("ERROR at line %u\n", __LINE__);
-
 	std::clock_t c_start = std::clock();
 	// Execute the kernel
-	err = clEnqueueNDRangeKernel(commands, kernel, 1, NULL, &global, &local, 0, NULL, NULL);
+	err = clEnqueueNDRangeKernel(commands, kernel, 1, NULL, &global, 0, 0, NULL, NULL);
 	if (err != CL_SUCCESS)		printf("ERROR at line %u\n", __LINE__);
 
 	// Give it time to finish
 	clFinish(commands);
 
+	float* output_data = (float*)malloc(count * sizeof(float));
 	err = clEnqueueReadBuffer(commands, write_buffer, CL_TRUE, 0, sizeof(float)*count, output_data, 0, NULL, NULL);
 	if (err != CL_SUCCESS)		printf("ERROR at line %u\n", __LINE__);
 	std::clock_t c_end = std::clock();
 	printf("Test duration (OpenCL): %f ms\n", 1000.0 * (c_end - c_start) / CLOCKS_PER_SEC);
 
-	float test_result[count];
+	float *test_result = (float*)malloc(count * sizeof(float));
 	c_start = std::clock();
 	for (int i = 0; i < count; i++) {
 		float num = input_data[i];
