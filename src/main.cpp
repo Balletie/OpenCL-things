@@ -13,9 +13,11 @@ void printCLDeviceInfo(cl_device_id device, bool print_extensions) {
 	char name[256];
 	clGetDeviceInfo(device, CL_DEVICE_NAME, 256, name, NULL);
 	printf(" * %s\n", name);
-	size_t work_item_sizes[10];
-	clGetDeviceInfo(device, CL_DEVICE_MAX_WORK_ITEM_SIZES, sizeof(size_t)*10, &work_item_sizes, NULL);
-	for (int i = 0; i < 3; i++) {
+	cl_uint dimensions;
+	clGetDeviceInfo(device, CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, sizeof(cl_uint), &dimensions, NULL);
+	size_t work_item_sizes[dimensions];
+	clGetDeviceInfo(device, CL_DEVICE_MAX_WORK_ITEM_SIZES, sizeof(size_t)*dimensions, &work_item_sizes, NULL);
+	for (int i = 0; i < dimensions; i++) {
 		printf("  Max work item size (dimension %d): %u\n",i, (unsigned int) work_item_sizes[i]);
 	}
 	if (!print_extensions) return;
@@ -83,7 +85,7 @@ int main() {
 	}
 	printf("\n");
 
-	size_t global = 1024;
+	size_t global = 8092;
 	unsigned int count = global * 1024;
 
 	// Fill the array
@@ -137,7 +139,7 @@ int main() {
 
 	std::clock_t c_start = std::clock();
 	// Execute the kernel
-	err = clEnqueueNDRangeKernel(commands, kernel, 1, NULL, &global, 0, 0, NULL, NULL);
+	err = clEnqueueNDRangeKernel(commands, kernel, 1, NULL, &global, NULL, 0, NULL, NULL);
 	if (err != CL_SUCCESS)		printf("ERROR at line %u\n", __LINE__);
 
 	// Give it time to finish
